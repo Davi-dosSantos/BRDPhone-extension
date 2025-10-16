@@ -127,7 +127,7 @@ function getHtmlPlugins(chunks) {
   return chunks.map(
     (chunk) =>
       new HTMLPlugin({
-        title: "Jambonz Webphone",
+        title: "BRDWebphone",
         filename: `${chunk}.html`,
         chunks: [chunk],
       })

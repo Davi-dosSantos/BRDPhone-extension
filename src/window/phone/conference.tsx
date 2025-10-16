@@ -171,7 +171,7 @@ export const JoinConference = ({
               });
             }}
             value={mode}
-            colorScheme="jambonz"
+            colorScheme="#172B4D"
           >
             <VStack align="start">
               <Radio value="full_participant" variant="">
@@ -220,7 +220,7 @@ export const JoinConference = ({
         </OutlineBox>
         <HStack w="full">
           <Button
-            colorScheme="jambonz"
+            colorScheme="#172B4D"
             type="submit"
             w="full"
             isLoading={isLoading}

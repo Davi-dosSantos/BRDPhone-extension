@@ -67,7 +67,7 @@ export const WindowApp = () => {
 
   const tabsSettings = [
     {
-      title: "Dialer",
+      title: "Telefone",
       content: (
         <Phone
           ref={phoneSipAschildRef}
@@ -88,7 +88,7 @@ export const WindowApp = () => {
       ),
     },
     {
-      title: "Calls",
+      title: "Chamadas",
       content: (
         <CallHistories
           calls={callHistories}
@@ -102,7 +102,7 @@ export const WindowApp = () => {
       ),
     },
     {
-      title: "Settings",
+      title: "Configurações",
       content: <Settings />,
     },
   ];
@@ -129,7 +129,7 @@ export const WindowApp = () => {
           <TabList mb="1em" gap={1}>
             {tabsSettings.map((s, i) => (
               <Tab
-                _selected={{ color: "white", bg: "jambonz.500" }}
+                _selected={{ color: "white", bg: "#172B4D" }}
                 bg="grey.500"
                 key={i}
               >

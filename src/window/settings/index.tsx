@@ -54,12 +54,12 @@ export const Settings = () => {
       {!showForm && !showFormInAccordion && (
         <Button
           marginY={"3"}
-          colorScheme="jambonz"
+          colorScheme="blue"
           w="full"
           onClick={handleOpenForm}
           isDisabled={btnIsDisabled}
         >
-          Add Account
+          Adicionar conta
         </Button>
       )}
 
@@ -73,7 +73,7 @@ export const Settings = () => {
         <Text>
           {allSettings.length} of {MAX_NUM_OF_ACCOUNTS}{" "}
         </Text>
-        {btnIsDisabled && <Text>Limit has been reached</Text>}
+        {btnIsDisabled && <Text>Numero máximo de contas</Text>}
       </Center>
 
       {/* <Tabs isFitted colorScheme={DEFAULT_COLOR_SCHEME}>

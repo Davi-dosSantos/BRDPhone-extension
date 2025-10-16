@@ -66,3 +66,61 @@ export const normalizeUrl = (input: string): string => {
   // Return the fully formed URL
   return `${url.protocol}//${url.hostname}/api/v1`;
 };
+
+// --- daemon window helpers ---
+
+const DAEMON_WINDOW_KEY = "daemonWindowId";
+
+export const getDaemonWindowIdKey = async (): Promise<number | null> => {
+  return new Promise((res) => {
+    chrome.storage.local.get([DAEMON_WINDOW_KEY], (items) => {
+      res(items[DAEMON_WINDOW_KEY] ?? null);
+    });
+  });
+};
+
+export const saveDaemonWindowIdKey = (id: number) => {
+  chrome.storage.local.set({ [DAEMON_WINDOW_KEY]: id });
+};
+
+export const deleteDaemonWindowIdKey = () => {
+  chrome.storage.local.remove([DAEMON_WINDOW_KEY]);
+};
+
+/**
+ * Open (or focus) a persistent daemon window that will keep the SIP client alive.
+ * The daemon window loads the same app page but with ?daemon=1 query param.
+ */
+export const openDaemonWindow = () => {
+  return new Promise((resolve) => {
+    getDaemonWindowIdKey().then((runningId) => {
+      if (runningId) {
+        chrome.windows.update(runningId, { focused: true }, (w) => {
+          if (chrome.runtime.lastError) {
+            deleteDaemonWindowIdKey();
+            createDaemon();
+          } else {
+            resolve(runningId);
+          }
+        });
+      } else {
+        createDaemon();
+      }
+    });
+
+    function createDaemon() {
+      const cfg: chrome.windows.CreateData = {
+        url: chrome.runtime.getURL("window/index.html?daemon=1"),
+        width: 420,
+        height: 640,
+        focused: true,
+        type: "popup",
+        state: "normal",
+      };
+      chrome.windows.create(cfg, (w) => {
+        if (w && w.id) saveDaemonWindowIdKey(w.id);
+        resolve(w?.id ?? null);
+      });
+    }
+  });
+};

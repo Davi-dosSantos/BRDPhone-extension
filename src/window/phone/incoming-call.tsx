@@ -27,7 +27,7 @@ export const IncommingCall = ({
       <Box
         as={FontAwesomeIcon}
         icon={faPhone}
-        color="jambonz.500"
+        color="#172B4D.500"
         width="30px"
         height="30px"
       />
@@ -37,13 +37,13 @@ export const IncommingCall = ({
       </Text>
 
       <HStack w="full">
-        <Button w="full" colorScheme="jambonz" onClick={decline}>
-          Decline
+        <Button w="full" colorScheme="red" onClick={decline}>
+          Encerrar
         </Button>
 
         <Spacer />
         <Button w="full" colorScheme="green" onClick={answer}>
-          Answer
+          Aceitar
         </Button>
       </HStack>
     </VStack>

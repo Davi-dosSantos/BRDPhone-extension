@@ -125,13 +125,13 @@ export const AdvancedSettings = () => {
               fontSize="14px"
               color={isCredentialOk ? "green.500" : "red.500"}
             >
-              Credential is {isCredentialOk ? "valid" : "invalid"}
+              Credencial {isCredentialOk ? "valida" : "invalida"}
             </Text>
           </HStack>
         )}
 
-        <Button colorScheme="jambonz" type="submit" w="full">
-          Save
+        <Button colorScheme="#172B4D" type="submit" w="full">
+          Salvar
         </Button>
         <VStack w="full" align="center" mt={2}>
           {/* <HStack spacing={1}>

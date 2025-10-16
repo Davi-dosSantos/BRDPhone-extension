@@ -115,7 +115,7 @@ function AccountForm({
       status: "success",
       duration: DEFAULT_TOAST_DURATION,
       isClosable: true,
-      colorScheme: "jambonz",
+      colorScheme: "#172B4D",
     });
 
     if (formData) {
@@ -178,7 +178,7 @@ function AccountForm({
             />
           </FormControl>
           <FormControl id={`jambonz_sip_domain${inputUniqueId}`}>
-            <FormLabel>Jambonz SIP Domain</FormLabel>
+            <FormLabel>SIP Domain</FormLabel>
             <Input
               type="text"
               placeholder="Domain"
@@ -189,10 +189,10 @@ function AccountForm({
           </FormControl>
 
           <FormControl id={`jambonz_server_address${inputUniqueId}`}>
-            <FormLabel>Jambonz Server Address</FormLabel>
+            <FormLabel>Server Address</FormLabel>
             <Input
               type="text"
-              placeholder="wss://sip.jambonz.cloud:8443/"
+              placeholder="wss://sip.brdvoz.cloud:8443/"
               isRequired
               value={sipServerAddress}
               onChange={(e) => setSipServerAddress(e.target.value)}
@@ -217,7 +217,7 @@ function AccountForm({
               placeHolder="Enter your password"
             />
           </FormControl>
-          {showAdvanced && (
+          {/* {showAdvanced && (
             <AnimateOnShow>
               <VStack w={"full"} bg={"gray.50"} borderRadius={"2xl"} p={"3.5"}>
                 <FormControl id={`jambonz_api_server${inputUniqueId}`}>
@@ -225,7 +225,7 @@ function AccountForm({
                   <Input
                     type="text"
                     placeholder="https://jambonz.cloud/api"
-                    isRequired
+                    isRequiredAddress
                     value={apiServer}
                     onChange={(e) => setApiServer(e.target.value)}
                   />
@@ -298,7 +298,7 @@ function AccountForm({
               </Text>
               <Image width={"15px"} height={"15px"} src={Switch} />
             </Button>
-          </Center>
+          </Center> */}
         </VStack>
 
         <HStack
@@ -309,24 +309,24 @@ function AccountForm({
         >
           <HStack>
             <Button
-              textColor={"jambonz.500"}
+              textColor={"white"}
               fontWeight={"semibold"}
               borderRadius={"11px"}
-              bg="jambonz.0"
+              bg="#172B4D"
               type="submit"
               w="full"
             >
-              Save
+              Salvar
             </Button>
             <Button
               variant={"ghost"}
-              colorScheme="jambonz"
+              colorScheme="#172B4D"
               type="reset"
               fontWeight={"semibold"}
               w="full"
               onClick={resetSetting}
             >
-              Cancel
+              Cancelar
             </Button>
           </HStack>
           <HStack

@@ -158,6 +158,20 @@ export const Phone = forwardRef(
 
     const toast = useToast();
 
+    // Notify background about connection status so the extension icon can reflect it.
+    // We treat "stop" as disconnected; any other status as connected.
+    useEffect(() => {
+      try {
+        const connected = status !== "stop";
+        chrome.runtime.sendMessage({
+          type: "SET_ICON",
+          payload: { connected },
+        });
+      } catch (err) {
+        // ignore in environments where chrome runtime isn't available
+      }
+    }, [status]);
+
     useImperativeHandle(ref, () => ({
       updateGoOffline(newState: string) {
         if (newState === "stop") {
@@ -578,7 +592,7 @@ export const Phone = forwardRef(
         {allSettings.length >= 1 ? (
           <>
             <Text fontSize={"small"} fontWeight={"semibold"} color={"gray.600"}>
-              Account
+              Contas
             </Text>
             <Box className="relative" w={"full"}>
               {
@@ -638,7 +652,7 @@ export const Phone = forwardRef(
           </>
         ) : (
           <Heading textAlign={"center"} size="md" mb={2}>
-            Go to Settings to configure your account
+            Vá em configurações e adicione uma conta para começar a usar!
           </Heading>
         )}
         {pageView === PAGE_VIEW.DIAL_PAD && (
@@ -809,25 +823,16 @@ export const Phone = forwardRef(
               textAlign="center"
               isReadOnly={!isSipClientIdle(callStatus)}
             />
-
-            {!isSipClientIdle(callStatus) && seconds >= 0 && (
-              <Text fontSize="15px">
-                {new Date(seconds * 1000).toISOString().substr(11, 8)}
-              </Text>
-            )}
-
-            <DialPad handleDigitPress={handleDialPadClick} />
-
             {isSipClientIdle(callStatus) ? (
               <Button
                 w="full"
                 onClick={handleCallButtion}
                 isDisabled={!isStatusRegistered()}
-                colorScheme="jambonz"
+                colorScheme="green"
                 alignContent="center"
                 isLoading={isCallButtonLoading}
               >
-                Call
+                Discar
               </Button>
             ) : (
               <HStack w="full">
@@ -859,7 +864,7 @@ export const Phone = forwardRef(
                   w="70px"
                   h="70px"
                   borderRadius="100%"
-                  colorScheme="jambonz"
+                  colorScheme="#172B4D"
                   onClick={handleHangup}
                 />
                 <Spacer />
@@ -887,6 +892,84 @@ export const Phone = forwardRef(
                 </Tooltip>
               </HStack>
             )}
+
+            {!isSipClientIdle(callStatus) && seconds >= 0 && (
+              <Text fontSize="15px">
+                {new Date(seconds * 1000).toISOString().substr(11, 8)}
+              </Text>
+            )}
+
+            <DialPad handleDigitPress={handleDialPadClick} />
+
+            {/* {isSipClientIdle(callStatus) ? (
+              <Button
+                w="full"
+                onClick={handleCallButtion}
+                isDisabled={!isStatusRegistered()}
+                colorScheme="green"
+                alignContent="center"
+                isLoading={isCallButtonLoading}
+              >
+                Discar
+              </Button>
+            ) : (
+              <HStack w="full">
+                <Tooltip
+                  label={sipUA.current?.isHolded(undefined) ? "UnHold" : "Hold"}
+                >
+                  <IconButton
+                    aria-label="Place call onhold"
+                    icon={
+                      <FontAwesomeIcon
+                        icon={
+                          sipUA.current?.isHolded(undefined) ? faPlay : faPause
+                        }
+                      />
+                    }
+                    w="33%"
+                    variant="unstyled"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    onClick={handleCallOnHold}
+                  />
+                </Tooltip>
+
+                <Spacer />
+                <IconButton
+                  aria-label="Hangup"
+                  icon={<FontAwesomeIcon icon={faPhoneSlash} />}
+                  w="70px"
+                  h="70px"
+                  borderRadius="100%"
+                  colorScheme="#172B4D"
+                  onClick={handleHangup}
+                />
+                <Spacer />
+                <Tooltip
+                  label={sipUA.current?.isMuted(undefined) ? "Unmute" : "Mute"}
+                >
+                  <IconButton
+                    aria-label="Mute"
+                    icon={
+                      <FontAwesomeIcon
+                        icon={
+                          sipUA.current?.isMuted(undefined)
+                            ? faMicrophone
+                            : faMicrophoneSlash
+                        }
+                      />
+                    }
+                    w="33%"
+                    variant="unstyled"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    onClick={handleCallMute}
+                  />
+                </Tooltip>
+              </HStack>
+            )} */}
           </VStack>
         )}
         {pageView === PAGE_VIEW.INCOMING_CALL && (

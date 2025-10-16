@@ -14,7 +14,7 @@ export const OutGoingCall = ({ number, cancelCall }: OutGoingCallProbs) => {
       <Box
         as={FontAwesomeIcon}
         icon={faPhone}
-        color="jambonz.500"
+        color="red"
         width="60px"
         height="60px"
       />
@@ -23,7 +23,7 @@ export const OutGoingCall = ({ number, cancelCall }: OutGoingCallProbs) => {
         {formatPhoneNumber(number)}
       </Text>
 
-      <Button w="full" colorScheme="jambonz" onClick={cancelCall}>
+      <Button w="full" colorScheme="red" onClick={cancelCall}>
         Cancel
       </Button>
     </VStack>

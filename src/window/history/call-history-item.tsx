@@ -102,7 +102,7 @@ export const CallHistoryItem = ({
               return;
             }
             const settings = getSettings();
-            const activeSettings = settings.find(el => el.active);
+            const activeSettings = settings.find((el) => el.active);
             if (activeSettings?.decoded.sipUsername) {
               isSaveCallHistory(
                 activeSettings?.decoded.sipUsername,

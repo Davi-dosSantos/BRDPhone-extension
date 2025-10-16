@@ -42,7 +42,7 @@ export const BasicSettings = () => {
       status: "success",
       duration: DEFAULT_TOAST_DURATION,
       isClosable: true,
-      colorScheme: "jambonz",
+      colorScheme: "#172B4D",
     });
   };
 
@@ -85,8 +85,8 @@ export const BasicSettings = () => {
           w="full"
           p={0}
         >
-          <FormControl id="jambonz_sip_domain">
-            <FormLabel>Jambonz SIP Domain</FormLabel>
+          <FormControl id="pbx">
+            <FormLabel> SIP Domain</FormLabel>
             <Input
               type="text"
               placeholder="Domain"
@@ -96,11 +96,11 @@ export const BasicSettings = () => {
             />
           </FormControl>
 
-          <FormControl id="jambonz_server_address">
-            <FormLabel>Jambonz Server Address</FormLabel>
+          <FormControl id="babx.brdexemplo.com.br">
+            <FormLabel> Server Address</FormLabel>
             <Input
               type="text"
-              placeholder="wss://sip.jambonz.cloud:8443/"
+              placeholder="wss://babx.brdexemplo.com.br:8089/"
               isRequired
               value={sipServerAddress}
               onChange={(e) => setSipServerAddress(e.target.value)}
@@ -111,7 +111,7 @@ export const BasicSettings = () => {
             <FormLabel>SIP Username</FormLabel>
             <Input
               type="text"
-              placeholder="Username"
+              placeholder="1234567"
               isRequired
               value={sipUsername}
               onChange={(e) => setSipUsername(e.target.value)}
@@ -136,7 +136,7 @@ export const BasicSettings = () => {
             />
           </FormControl>
         </VStack>
-        <Button colorScheme="jambonz" type="submit" w="full">
+        <Button colorScheme="green" type="submit" w="full">
           Save
         </Button>
         <VStack w="full" alignItems="center" mt={2}>
@@ -149,7 +149,7 @@ export const BasicSettings = () => {
           <HStack spacing={1}>
             <Image src={ResetIcon} w="30px" h="30px" />
             <Text fontSize="14px" onClick={resetSetting} cursor="pointer">
-              Reset settings
+              Resetar configurações
             </Text>
           </HStack>
         </VStack>

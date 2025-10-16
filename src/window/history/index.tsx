@@ -36,8 +36,8 @@ export const CallHistories = ({
   return (
     <Tabs isFitted colorScheme={DEFAULT_COLOR_SCHEME}>
       <TabList mb="1em" gap={1}>
-        <Tab>Recent</Tab>
-        <Tab>Saved</Tab>
+        <Tab>Recentes</Tab>
+        <Tab>Salvas</Tab>
       </TabList>
 
       <Grid w="full" templateColumns="1fr auto" gap={5}>
@@ -58,7 +58,7 @@ export const CallHistories = ({
         <HStack spacing={2} bg="grey.100" p={2} borderRadius={7}>
           <FontAwesomeIcon icon={faSliders} width="20px" height="20px" />
           <Text fontSize="12px" fontWeight="500">
-            Filter
+            filtro
           </Text>
         </HStack>
       </Grid>
