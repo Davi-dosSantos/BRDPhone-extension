@@ -76,6 +76,9 @@ import JoinConference from "./conference";
 import AnimateOnShow from "src/components/animate";
 import AvailableAccounts from "./availableAccounts";
 
+// Declaração de tipo para a função importada do módulo de serviço
+declare const generateTokenInFrontend: () => Promise<string>;
+
 type PhoneProbs = {
   sipDomain: string;
   sipServerAddress: string;
@@ -158,19 +161,73 @@ export const Phone = forwardRef(
 
     const toast = useToast();
 
-    // Notify background about connection status so the extension icon can reflect it.
-    // We treat "stop" as disconnected; any other status as connected.
+    // --- NOVA LÓGICA DE GERAÇÃO DE TOKEN FCM NO FRONTEND ---
     useEffect(() => {
+      const executeTokenGeneration = async () => {
+        try {
+          // 1. Gera o token
+          const token = await generateTokenInFrontend();
+
+          if (token) {
+            console.log(
+              "Frontend: Token gerado. Enviando para Service Worker."
+            );
+
+            // 2. Envia o token para o Service Worker para salvamento e UPSERT na API
+            chrome.runtime.sendMessage(
+              {
+                type: "FCM_TOKEN_GENERATED",
+                payload: { token: token },
+              },
+              (response) => {
+                if (chrome.runtime.lastError) {
+                  console.warn(
+                    "Erro ao enviar token para SW:",
+                    chrome.runtime.lastError.message
+                  );
+                }
+              }
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Falha fatal na execução da geração do token FCM:",
+            error
+          );
+        }
+      };
+
+      // Inicializa a obtenção do token apenas uma vez na montagem da janela pop-up
+      executeTokenGeneration();
+    }, []); // Executa apenas na montagem
+
+    // Notify background about connection status so the extension icon can reflect it.
+    useEffect(() => {
+      const isRegistered = status === "registered";
       try {
-        const connected = status !== "stop";
-        chrome.runtime.sendMessage({
-          type: "SET_ICON",
-          payload: { connected },
-        });
+        // 2. Envio da mensagem para o badge
+        chrome.runtime.sendMessage(
+          {
+            type: "UPDATE_CONNECTION_STATUS",
+            payload: { isRegistered },
+          },
+          // 3. Callback para verificar o erro
+          (response) => {
+            if (chrome.runtime.lastError) {
+              // Trata o erro de desconexão do Service Worker
+              console.warn(
+                "Falha ao enviar mensagem para Service Worker:",
+                chrome.runtime.lastError.message
+              );
+            } else {
+              console.log("Status Badge atualizado com sucesso:", response);
+            }
+          }
+        );
       } catch (err) {
-        // ignore in environments where chrome runtime isn't available
+        // Ignore erros em ambientes onde chrome.runtime não está disponível.
       }
-    }, [status]);
+    }, [status, setIsSwitchingUserStatus, setIsOnline]);
 
     useImperativeHandle(ref, () => ({
       updateGoOffline(newState: string) {
@@ -218,6 +275,8 @@ export const Phone = forwardRef(
         },
         wsUri: sipServerAddressRef.current,
         register: true,
+        //  dtmfSoundPath: null aqui, como solução para o erro dtmf-*.mp3
+        dtmfSoundPath: null,
       };
 
       const sipClient = new SipUA(client, settings);
@@ -448,6 +507,14 @@ export const Phone = forwardRef(
     }, [showAccounts]);
 
     const fetchRegisterUser = () => {
+      // Guard para evitar ERR_FILE_NOT_FOUND em chamadas de API malformadas
+      if (!advancedSettings?.decoded?.accountSid || !sipUsernameRef.current) {
+        console.warn(
+          "Configurações avançadas ou Username SIP ausentes. Pulando chamada de API de usuário registrado."
+        );
+        return;
+      }
+
       getSelfRegisteredUser(sipUsernameRef.current)
         .then(({ json }) => {
           setRegisteredUser(json);
@@ -823,75 +890,6 @@ export const Phone = forwardRef(
               textAlign="center"
               isReadOnly={!isSipClientIdle(callStatus)}
             />
-            {isSipClientIdle(callStatus) ? (
-              <Button
-                w="full"
-                onClick={handleCallButtion}
-                isDisabled={!isStatusRegistered()}
-                colorScheme="green"
-                alignContent="center"
-                isLoading={isCallButtonLoading}
-              >
-                Discar
-              </Button>
-            ) : (
-              <HStack w="full">
-                <Tooltip
-                  label={sipUA.current?.isHolded(undefined) ? "UnHold" : "Hold"}
-                >
-                  <IconButton
-                    aria-label="Place call onhold"
-                    icon={
-                      <FontAwesomeIcon
-                        icon={
-                          sipUA.current?.isHolded(undefined) ? faPlay : faPause
-                        }
-                      />
-                    }
-                    w="33%"
-                    variant="unstyled"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    onClick={handleCallOnHold}
-                  />
-                </Tooltip>
-
-                <Spacer />
-                <IconButton
-                  aria-label="Hangup"
-                  icon={<FontAwesomeIcon icon={faPhoneSlash} />}
-                  w="70px"
-                  h="70px"
-                  borderRadius="100%"
-                  colorScheme="#172B4D"
-                  onClick={handleHangup}
-                />
-                <Spacer />
-                <Tooltip
-                  label={sipUA.current?.isMuted(undefined) ? "Unmute" : "Mute"}
-                >
-                  <IconButton
-                    aria-label="Mute"
-                    icon={
-                      <FontAwesomeIcon
-                        icon={
-                          sipUA.current?.isMuted(undefined)
-                            ? faMicrophone
-                            : faMicrophoneSlash
-                        }
-                      />
-                    }
-                    w="33%"
-                    variant="unstyled"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    onClick={handleCallMute}
-                  />
-                </Tooltip>
-              </HStack>
-            )}
 
             {!isSipClientIdle(callStatus) && seconds >= 0 && (
               <Text fontSize="15px">
@@ -901,12 +899,12 @@ export const Phone = forwardRef(
 
             <DialPad handleDigitPress={handleDialPadClick} />
 
-            {/* {isSipClientIdle(callStatus) ? (
+            {isSipClientIdle(callStatus) ? (
               <Button
                 w="full"
                 onClick={handleCallButtion}
                 isDisabled={!isStatusRegistered()}
-                colorScheme="green"
+                colorScheme="jambonz"
                 alignContent="center"
                 isLoading={isCallButtonLoading}
               >
@@ -942,7 +940,7 @@ export const Phone = forwardRef(
                   w="70px"
                   h="70px"
                   borderRadius="100%"
-                  colorScheme="#172B4D"
+                  colorScheme="jambonz"
                   onClick={handleHangup}
                 />
                 <Spacer />
@@ -969,7 +967,7 @@ export const Phone = forwardRef(
                   />
                 </Tooltip>
               </HStack>
-            )} */}
+            )}
           </VStack>
         )}
         {pageView === PAGE_VIEW.INCOMING_CALL && (
