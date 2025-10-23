@@ -9,7 +9,15 @@
   "background": {
     "service_worker": "background/index.js"
   },
-  "permissions": ["storage"],
+  "permissions": [
+    "gcm",
+    "storage",
+    "notifications",
+    "alarms",
+    "tabs",
+    "webRequest",
+    "webRequestBlocking"
+  ],
   "host_permissions": ["https://*/*"],
   "icons": {
     "16": "icons/icon.png",

@@ -7,19 +7,19 @@ const mainTheme = extendTheme({
   },
   colors: {
     jambonz: {
-      0: "#EDDEE3",
-      50: "#ffe1f1",
-      100: "#ffb3c6",
-      200: "#fc839d",
-      300: "#fa5575",
-      400: "#f8274e",
-      450: "#BD4782",
-      500: "#BB225B",
-      550: "#DA1C5C",
-      600: "#c60921",
-      700: "#99081a",
-      800: "#6c0714",
-      900: "#44060d",
+      0: "#B8C9E0", // Muito claro (quase branco/cinza claro)
+      50: "#98AECF", // Claro
+      100: "#7993BF",
+      200: "#5B79AF",
+      300: "#3D5F9A",
+      400: "#2B4C80", // Tom que precede a cor principal
+      450: "#1E4473",
+      500: "#183E65", // Cor Principal
+      550: "#14375A",
+      600: "#10304F", // Tom mais escuro
+      700: "#0C2744",
+      800: "#081E33",
+      900: "#041521", // Mais escuro (quase preto)
     },
     grey: {
       50: "#FFFFFF",
@@ -63,7 +63,7 @@ const mainTheme = extendTheme({
 
 export const colors = {
   //to use outside of chakra component
-  jambonz: "#DA1C5C",
+  jambonz: "#183E65",
 };
 
 export default mainTheme;

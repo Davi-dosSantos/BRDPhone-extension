@@ -15,6 +15,18 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
+chrome.gcm.onMessage.addListener(function (message) {
+  // Lidar com a mensagem de dados recebida
+  console.log("Mensagem FCM recebida:", message.data);
+  // Exemplo de notificação
+  chrome.notifications.create("notificationId", {
+    type: "basic",
+    iconUrl: "icon.png",
+    title: "Nova Mensagem",
+    message: "Dados push recebidos",
+  });
+});
+
 const initiateNewPhonePopup = () => {
   chrome.windows.create(
     {
@@ -22,8 +34,7 @@ const initiateNewPhonePopup = () => {
       width: 440,
       height: 750,
       focused: true,
-      type: "panel",
-      state: "normal",
+      type: "popup",
     },
     function (window) {
       if (window?.id) {
