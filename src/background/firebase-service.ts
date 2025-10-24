@@ -96,7 +96,6 @@ async function apiPushToken(token: string): Promise<void> {
 
 /**
  * Inicializa o Firebase App no Service Worker.
- * NOTA: Não contém getToken para evitar erros de contexto.
  */
 export function initializeFirebase(): void {
   initializeApp(firebaseConfig);
@@ -104,7 +103,7 @@ export function initializeFirebase(): void {
 }
 
 /**
- * [USADO NO SW] Recebe o token gerado pelo Frontend, salva e envia para a API.
+ * Recebe o token gerado pelo Frontend, salva e envia para a API.
  */
 export async function handleTokenFromFrontend(token: string): Promise<void> {
   if (token) {
@@ -124,15 +123,19 @@ export async function generateTokenInFrontend(): Promise<string> {
     console.warn(
       "Firebase Messaging não suportado na Janela. Verificar permissões."
     );
-    return "";
+    return " ";
   }
 
-  // Inicializa o App no Frontend. Note que o App precisa ser inicializado em AMBOS os contextos.
+  // Inicializa o App no Frontend.
   const app = initializeApp(firebaseConfig);
   const messaging = getMessaging(app);
 
   try {
-    const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+    const currentToken = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration:
+        await navigator.serviceWorker.getRegistration(),
+    });
     return currentToken;
   } catch (err) {
     // Captura a falha na obtenção do token (e.g., usuário negou permissão)

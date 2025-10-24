@@ -1,5 +1,4 @@
 import { HStack, Image, Text } from "@chakra-ui/react";
-import jambonz from "src/imgs/jambonz.svg";
 import logo_brd from "src/imgs/logo_brd.svg";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { SipClientStatus } from "src/common/types";

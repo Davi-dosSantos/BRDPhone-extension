@@ -75,9 +75,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import JoinConference from "./conference";
 import AnimateOnShow from "src/components/animate";
 import AvailableAccounts from "./availableAccounts";
-
-// Declaração de tipo para a função importada do módulo de serviço
-declare const generateTokenInFrontend: () => Promise<string>;
+import { generateTokenInFrontend } from "src/background/firebase-service";
 
 type PhoneProbs = {
   sipDomain: string;
@@ -161,19 +159,19 @@ export const Phone = forwardRef(
 
     const toast = useToast();
 
-    // --- NOVA LÓGICA DE GERAÇÃO DE TOKEN FCM NO FRONTEND ---
+    // --- LÓGICA DE GERAÇÃO DE TOKEN FCM NO FRONTEND ---
     useEffect(() => {
       const executeTokenGeneration = async () => {
         try {
-          // 1. Gera o token
+          // 1. Gera o token (função agora corretamente importada)
           const token = await generateTokenInFrontend();
 
           if (token) {
             console.log(
-              "Frontend: Token gerado. Enviando para Service Worker."
+              "Frontend: FCM Token gerado. Enviando para Service Worker."
             );
 
-            // 2. Envia o token para o Service Worker para salvamento e UPSERT na API
+            // 2. Envia o token para o Service Worker
             chrome.runtime.sendMessage(
               {
                 type: "FCM_TOKEN_GENERATED",
@@ -197,9 +195,37 @@ export const Phone = forwardRef(
         }
       };
 
-      // Inicializa a obtenção do token apenas uma vez na montagem da janela pop-up
       executeTokenGeneration();
-    }, []); // Executa apenas na montagem
+    }, []);
+
+    // Notify background about connection status so the extension icon can reflect it.
+    useEffect(() => {
+      const isRegistered = status === "registered";
+      try {
+        // 2. Envio da mensagem para o badge
+        chrome.runtime.sendMessage(
+          {
+            type: "UPDATE_CONNECTION_STATUS",
+            payload: { isRegistered },
+          },
+          // 3. Callback para verificar o erro
+          (response) => {
+            if (chrome.runtime.lastError) {
+              // Trata o erro de desconexão do Service Worker
+              console.warn(
+                "Falha ao enviar mensagem para Service Worker:",
+                chrome.runtime.lastError.message
+              );
+            } else {
+              // Este log indica que a mensagem chegou e o SW executou a lógica do badge.
+              console.log("Status Badge atualizado com sucesso:", response);
+            }
+          }
+        );
+      } catch (err) {
+        // Ignore erros em ambientes onde chrome.runtime não está disponível.
+      }
+    }, [status]);
 
     // Notify background about connection status so the extension icon can reflect it.
     useEffect(() => {
@@ -507,11 +533,8 @@ export const Phone = forwardRef(
     }, [showAccounts]);
 
     const fetchRegisterUser = () => {
-      // Guard para evitar ERR_FILE_NOT_FOUND em chamadas de API malformadas
-      if (!advancedSettings?.decoded?.accountSid || !sipUsernameRef.current) {
-        console.warn(
-          "Configurações avançadas ou Username SIP ausentes. Pulando chamada de API de usuário registrado."
-        );
+      if (!sipUsernameRef.current) {
+        console.warn("Configurações avançadas ou Username SIP ausentes.");
         return;
       }
 

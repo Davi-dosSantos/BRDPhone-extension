@@ -37,7 +37,8 @@ module.exports = [
     mode: "production",
     output: {
       path: path.join(__dirname, "dist"),
-      filename: "background/index.js",
+      filename: "[name].js",
+      //filename: "background/index.js",
     },
     module: {
       rules: [
@@ -62,6 +63,7 @@ module.exports = [
   {
     entry: {
       index: "./src/window/index.tsx",
+      "firebase-messaging-sw": "./src/background/firebase-messaging-sw.ts",
     },
     mode: "production",
     module: {

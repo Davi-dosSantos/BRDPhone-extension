@@ -27,5 +27,11 @@
     "384": "icons/icon384.png",
     "512": "icons/icon512.png",
     "1024": "icons/icon1024.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["firebase-messaging-sw.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
